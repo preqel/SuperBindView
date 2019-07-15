@@ -1,6 +1,7 @@
 package com.example.process;
 
 import com.example.annotation.BindView;
+import com.example.annotation.setText;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.JavaFile;
 
@@ -55,6 +56,7 @@ public class BindViewProcessor extends AbstractProcessor {
             String fullClassName = classElement.getQualifiedName().toString();
             //elements的信息保存到mProxyMap中
             ClassCreatorProxy proxy = mProxyMap.get(fullClassName);
+
             if (proxy == null) {
                 proxy = new ClassCreatorProxy(mElementUtils, classElement);
                 mProxyMap.put(fullClassName, proxy);
@@ -63,6 +65,17 @@ public class BindViewProcessor extends AbstractProcessor {
             int id = bindAnnotation.value();
             proxy.putElement(id, variableElement);
         }
+
+
+        Set<? extends Element> elements2= roundEnv.getElementsAnnotatedWith(setText.class);
+        for(Element element:elements){
+            VariableElement variableElement= (VariableElement) element;
+            TypeElement typeElement  = (TypeElement) element.getEnclosingElement();
+
+        }
+
+
+
         //通过遍历mProxyMap，创建java文件
         //通过StringBuilder生成
         /*for (String key : mProxyMap.keySet()) {
@@ -81,7 +94,7 @@ public class BindViewProcessor extends AbstractProcessor {
         //通过javapoet生成
         for (String key : mProxyMap.keySet()) {
             ClassCreatorProxy proxyInfo = mProxyMap.get(key);
-            JavaFile javaFile = JavaFile.builder(proxyInfo.getPackageName(), proxyInfo.generateJavaCode2()).build();
+            JavaFile javaFile = JavaFile.builder(proxyInfo.getPackageName(), proxyInfo.generateJavaCode2(mMessager)).build();
             try {
                 //　生成文件
                 javaFile.writeTo(processingEnv.getFiler());
@@ -98,6 +111,7 @@ public class BindViewProcessor extends AbstractProcessor {
     public Set<String> getSupportedAnnotationTypes() {
         HashSet<String> supportTypes = new LinkedHashSet<>();
         supportTypes.add(BindView.class.getCanonicalName());
+        supportTypes.add(setText.class.getCanonicalName());
         return supportTypes;
     }
 

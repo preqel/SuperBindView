@@ -7,11 +7,13 @@ import com.squareup.javapoet.TypeSpec;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.processing.Messager;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
+import javax.tools.Diagnostic;
 
 /**
  * Created by gavin
@@ -89,10 +91,10 @@ public class ClassCreatorProxy {
      *
      * @return
      */
-    public TypeSpec generateJavaCode2() {
+    public TypeSpec generateJavaCode2(Messager mMessager) {
         TypeSpec bindingClass = TypeSpec.classBuilder(mBindingClassName)
                 .addModifiers(Modifier.PUBLIC)
-                .addMethod(generateMethods2())
+                .addMethod(generateMethods2(mMessager))
                 .build();
         return bindingClass;
 
@@ -102,7 +104,7 @@ public class ClassCreatorProxy {
      * 加入Method
      * javapoet
      */
-    private MethodSpec generateMethods2() {
+    private MethodSpec generateMethods2( Messager messager) {
         ClassName host = ClassName.bestGuess(mTypeElement.getQualifiedName().toString());
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("bind")
                 .addModifiers(Modifier.PUBLIC)
@@ -112,7 +114,10 @@ public class ClassCreatorProxy {
         for (int id : mVariableElementMap.keySet()) {
             VariableElement element = mVariableElementMap.get(id);
             String name = element.getSimpleName().toString();
+
+
             String type = element.asType().toString();
+            messager.printMessage(Diagnostic.Kind.NOTE,"name:" + name+" "+"type:"+type);
             methodBuilder.addCode("host." + name + " = " + "(" + type + ")(((android.app.Activity)host).findViewById( " + id + "));");
         }
         return methodBuilder.build();
