@@ -4,9 +4,12 @@
 在allprojects 里面 maven { url 'https://jitpack.io' }在项目的build.gradle里面增加 implementation 'com.github.preqel:SuperBindView:1.0' 的依赖
 
 # 具体说明
-1.注解 @BindView
+1.@BindView
 作用等同于findviewbyid
-2.注解 @setText
+2. @setText
 作用相当于settext
-3.注解 @ OnClick
-设置点击事件
+3. @OnClick
+设置view的点击事件，方法注解，注解要传入设置的view的id
+
+# 借鉴感谢
+JakeWartong大神的ButterKnife框架
